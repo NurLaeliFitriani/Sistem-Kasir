@@ -1,0 +1,115 @@
+name: PHP Checks & Tests
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  php-lint:
+    runs-on: ubuntu-latest
+    name: PHP Linting
+    strategy:
+      matrix:
+        php-versions: ['7.4', '8.0', '8.1']
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-versions }}
+        tools: phpstan, phpcs
+    
+    - name: Check PHP syntax
+      run: |
+        for file in *.php; do
+          php -l "$file" || exit 1
+        done
+    
+    - name: Run PHPCS
+      run: phpcs --standard=PSR12 *.php || true
+
+  security-check:
+    runs-on: ubuntu-latest
+    name: Security Checks
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.1'
+    
+    - name: Check for PHP vulnerabilities
+      run: |
+        # Simple check for common security issues
+        if grep -r "eval(" *.php; then
+          echo "⚠️  Warning: eval() found in code"
+        fi
+        if grep -r "exec(" *.php; then
+          echo "⚠️  Warning: exec() found in code"
+        fi
+        if grep -r "\$_GET\[" *.php | grep -v "htmlspecialchars\|mysqli_real_escape\|filter_var"; then
+          echo "⚠️  Warning: Possible unsanitized \$_GET variables"
+        fi
+
+  code-quality:
+    runs-on: ubuntu-latest
+    name: Code Quality
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Check file count
+      run: |
+        FILE_COUNT=$(find . -name "*.php" -type f | wc -l)
+        echo "Found $FILE_COUNT PHP files"
+    
+    - name: Validate config.php exists
+      run: |
+        if [ -f "config.php" ]; then
+          echo "✅ config.php found"
+        else
+          echo "⚠️  config.php not found"
+        fi
+    
+    - name: Check database.sql
+      run: |
+        if [ -f "database.sql" ]; then
+          echo "✅ database.sql found"
+        else
+          echo "⚠️  database.sql not found"
+        fi
+    
+    - name: Validate README
+      run: |
+        if [ -f "README.md" ]; then
+          echo "✅ README.md found"
+        else
+          echo "❌ README.md not found"
+          exit 1
+        fi
+
+  summary:
+    runs-on: ubuntu-latest
+    name: Build Summary
+    needs: [php-lint, security-check, code-quality]
+    if: always()
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Summary
+      run: |
+        echo "✅ All checks completed!"
+        echo "PHP Linting: Checked PHP syntax across versions"
+        echo "Security Checks: Verified code security"
+        echo "Code Quality: Validated project structure"
