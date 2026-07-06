@@ -1,4 +1,4 @@
-<img width="949" height="443" alt="image" src="https://github.com/user-attachments/assets/638b4d0a-1e4e-45ff-a3fe-5ff137c52ca5" /># 🛒 Kasir App - Sistem Point of Sale (POS)
+# 🛒 SISTEM KASIR TB.JAYA SANTOSA - Point of Sale (POS)
 
 Aplikasi Kasir (POS) yang simpel dan mudah digunakan untuk mengelola penjualan, inventaris barang, dan transaksi di toko Anda.
 
