@@ -206,4 +206,15 @@ Temukan bug? Silakan buat Issue dengan:
 
 ---
 
+## 👨‍💻 Author
+
+| Attribute | Informasi |
+|-----------|-----------|
+| **Nama** | Nur Laeli Fitriani |
+| **NIM** | 101230051 |
+| **Mata Kuliah** | Kewirausahaan Teknologi |
+| **Kelas** | TF23C |
+
+---
+
 **Made with ❤️ for small business owners**
