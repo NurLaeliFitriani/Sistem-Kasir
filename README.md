@@ -1,6 +1,6 @@
-# 🛒 Kasir App - Sistem Point of Sale (POS)
+# 🛒 SISTEM KASIR TB.JAYA SANTOSA - Point of Sale (POS)
 
-Aplikasi Kasir (POS) yang simpel dan mudah digunakan untuk mengelola penjualan, inventaris barang, dan transaksi di toko Anda.
+Aplikasi Kasir (POS) yang simpel dan mudah digunakan untuk mengelola penjualan, inventaris barang, dan transaksi di TB.Jaya Santosa.
 
 ## ✨ Fitur
 
@@ -215,6 +215,5 @@ Temukan bug? Silakan buat Issue dengan:
 | **Mata Kuliah** | Kewirausahaan Teknologi |
 | **Kelas** | TF23C |
 
----
 
 **Made with ❤️ for small business owners**
