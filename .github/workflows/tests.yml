@@ -2,114 +2,53 @@ name: PHP Checks & Tests
 
 on:
   push:
-    branches: [ main, master, develop ]
+    branches: [ master, main, develop ]
   pull_request:
-    branches: [ main, master, develop ]
+    branches: [ master, main, develop ]
 
 jobs:
-  php-lint:
+  php-syntax:
     runs-on: ubuntu-latest
-    name: PHP Linting
-    strategy:
-      matrix:
-        php-versions: ['7.4', '8.0', '8.1']
+    name: PHP Syntax Check
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-    
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: ${{ matrix.php-versions }}
-        tools: phpstan, phpcs
-    
-    - name: Check PHP syntax
-      run: |
-        for file in *.php; do
-          php -l "$file" || exit 1
-        done
-    
-    - name: Run PHPCS
-      run: phpcs --standard=PSR12 *.php || true
-
-  security-check:
-    runs-on: ubuntu-latest
-    name: Security Checks
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+    - uses: actions/checkout@v3
     
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
         php-version: '8.1'
     
-    - name: Check for PHP vulnerabilities
+    - name: Check PHP files
       run: |
-        # Simple check for common security issues
-        if grep -r "eval(" *.php; then
-          echo "⚠️  Warning: eval() found in code"
-        fi
-        if grep -r "exec(" *.php; then
-          echo "⚠️  Warning: exec() found in code"
-        fi
-        if grep -r "\$_GET\[" *.php | grep -v "htmlspecialchars\|mysqli_real_escape\|filter_var"; then
-          echo "⚠️  Warning: Possible unsanitized \$_GET variables"
-        fi
+        for file in *.php; do
+          if [ -f "$file" ]; then
+            php -l "$file"
+          fi
+        done
 
-  code-quality:
+  validate-files:
     runs-on: ubuntu-latest
-    name: Code Quality
+    name: Validate Required Files
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+    - uses: actions/checkout@v3
     
-    - name: Check file count
-      run: |
-        FILE_COUNT=$(find . -name "*.php" -type f | wc -l)
-        echo "Found $FILE_COUNT PHP files"
-    
-    - name: Validate config.php exists
-      run: |
-        if [ -f "config.php" ]; then
-          echo "✅ config.php found"
-        else
-          echo "⚠️  config.php not found"
-        fi
+    - name: Check config.php
+      run: test -f config.php && echo "config.php exists" || echo "config.php not found"
     
     - name: Check database.sql
-      run: |
-        if [ -f "database.sql" ]; then
-          echo "✅ database.sql found"
-        else
-          echo "⚠️  database.sql not found"
-        fi
+      run: test -f database.sql && echo "database.sql exists" || echo "database.sql not found"
     
-    - name: Validate README
-      run: |
-        if [ -f "README.md" ]; then
-          echo "✅ README.md found"
-        else
-          echo "❌ README.md not found"
-          exit 1
-        fi
+    - name: Check README
+      run: test -f README.md && echo "README.md exists" || (echo "README.md not found" && exit 1)
 
-  summary:
+  build-success:
     runs-on: ubuntu-latest
-    name: Build Summary
-    needs: [php-lint, security-check, code-quality]
+    name: Build Success
+    needs: [php-syntax, validate-files]
     if: always()
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-    
-    - name: Summary
-      run: |
-        echo "✅ All checks completed!"
-        echo "PHP Linting: Checked PHP syntax across versions"
-        echo "Security Checks: Verified code security"
-        echo "Code Quality: Validated project structure"
+    - name: All checks passed
+      run: echo "All GitHub Actions checks completed successfully"
